@@ -1,0 +1,27 @@
+{
+  "name": "my-erc20-token",
+  "version": "1.0.0",
+  "description": "My ERC20 Tokens",
+  "main": "contracts",
+  "directories": {
+    "test": "test",
+    "migrations": "migrations"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "wertykevin91",
+  "license": "ISC",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "dependencies": {
+    "bignumber.js": "^8.0.1",
+    "truffle-hdwallet-provider": "0.0.6"
+  }
+}

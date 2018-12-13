@@ -1,0 +1,8 @@
+{
+    "tokenName": "My ERC20 Token",
+    "tokenSymbol": "MET",
+    "tokenDecimals": 18,
+    "tokenTotalSupply": 100000000,
+    "tokenRaiseAmountUSD": 25000000,
+    "ethPriceUSD": 90
+}
