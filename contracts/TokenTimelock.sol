@@ -1,5 +1,5 @@
 // solium-disable linebreak-style
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 contract ERC20 {
     function totalSupply() public view returns (uint256);
@@ -57,7 +57,7 @@ contract TokenTimelock {
         // solium-disable security/no-block-members
         require(now >= releaseTime, "Release time not reached.");
 
-        uint256 amount = token.balanceOf(this);
+        uint256 amount = token.balanceOf(address(this));
         require(amount > 0, "Invalid token balance");
 
         token.safeTransfer(beneficiary, amount);

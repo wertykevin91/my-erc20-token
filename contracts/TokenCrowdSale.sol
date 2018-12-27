@@ -1,5 +1,5 @@
 // solium-disable linebreak-style
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "./Token.sol";
 import "./SafeMath.sol";
@@ -37,7 +37,7 @@ contract TokenCrowdSale is OwnedByICOOwner {
     Token public token;
 
     // ==== funds will be transferred to this address ==== //
-    address public coldStorage;
+    address payable public coldStorage;
 
     // // ==== maximum contribution per address ==== //
     // uint public constant MAX_CONTRIBUTION = xx ether;
@@ -58,7 +58,7 @@ contract TokenCrowdSale is OwnedByICOOwner {
                                 uint256 _hardCap,
                                 uint256 _startDate, uint256 _endDate) public {
         token = Token(_Token);             // initialising reference to ERC20
-        coldStorage = _contributionColdStorage;  // cold wallet meant for contribution holding
+        coldStorage = address(uint160(_contributionColdStorage));  // cold wallet meant for contribution holding
         startDate = _startDate;                  // ICO start date in UNIX time
         endDate = _endDate;                      // ICO end date in UNIX time
         owner = msg.sender;                      // Set contract ownership
@@ -67,7 +67,7 @@ contract TokenCrowdSale is OwnedByICOOwner {
 
     event RevertLog(string message);
 
-    function() public payable {
+    function() external payable {
         uint256 a;       
         // crowdsale checks
         // accept only contributions > 0.1ETH
@@ -134,7 +134,7 @@ contract TokenCrowdSale is OwnedByICOOwner {
     }
 
 
-    function addToWhiteList(address[] _contributor, uint256[] _amount) external onlyOwner {
+    function addToWhiteList(address[] calldata _contributor, uint256[] calldata _amount) external onlyOwner {
         require(_contributor.length < 255);
         for (uint8 i = 0; i < _contributor.length; i++) {
             address tmpAddress = _contributor[i];
@@ -171,7 +171,7 @@ contract TokenCrowdSale is OwnedByICOOwner {
      * Notifies ERC20 contract for tokens to be burnt
      */
     function burnTokens() public onlyOwner {
-        token.burnSent(token.balanceOf(this));
+        token.burnSent(token.balanceOf(address(this)));
     }
 
     /**

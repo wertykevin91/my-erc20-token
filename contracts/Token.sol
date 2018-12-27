@@ -1,5 +1,5 @@
 // solium-disable linebreak-style
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "./SafeMath.sol";
 
@@ -111,21 +111,21 @@ contract Token is Owned, StandardToken {
     string public name;                   
     uint8 public decimals;                
     string public symbol;                 
-    uint256 public totalSupply;
+    uint256 public totalSupply_;
     address public distributionAddress;
     bool public isTransferable = false;
     
 
-    constructor(string _name, uint8 _decimals, string _symbol, uint256 _totalSupply) public {
+    constructor(string memory _name, uint8 _decimals, string memory _symbol, uint256 _totalSupply) public {
         name = _name;                          
         decimals = _decimals; 
         symbol = _symbol;
-        totalSupply = _totalSupply * 10 ** uint256(decimals); 
+        totalSupply_ = _totalSupply * 10 ** uint256(decimals); 
         owner = msg.sender;
 
         //transfer all to handler address
-        balances[msg.sender] = totalSupply;
-        emit Transfer(0x0, msg.sender, totalSupply);
+        balances[msg.sender] = totalSupply_;
+        emit Transfer(address(0), msg.sender, totalSupply_);
     }
 
     function transfer(address _to, uint256 _value) public returns (bool) {
@@ -143,7 +143,7 @@ contract Token is Owned, StandardToken {
      * Suggested way is still to use the burnSent function
      */    
     function totalSupply() public view returns (uint256) {
-        return totalSupply;
+        return totalSupply_;
     }
 
     /**
@@ -163,7 +163,7 @@ contract Token is Owned, StandardToken {
 
         address burner = msg.sender;
         balances[burner] = balances[burner].sub(_value);
-        totalSupply = totalSupply.sub(_value);
+        totalSupply_ = totalSupply_.sub(_value);
         emit Burn(burner, _value);
     }
 
