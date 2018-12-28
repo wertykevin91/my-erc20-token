@@ -1,11 +1,11 @@
 const Token = artifacts.require('./Token.sol');
 const BigNumber = require('bignumber.js');
 
-contract('Token check', (accounts)=>{
+contract('Transfer from check', (accounts)=>{
     it("Check transfer froms", ()=>{
         var tokenContract;
-        const amountToTransfer = new BigNumber(500 * Math.pow(10, 18));
-        const amountToAllow = new BigNumber(50 * Math.pow(10, 18));
+        const amountToTransfer = new (new BigNumber(500)).times((new BigNumber(10).pow(new BigNumber(18))));
+        const amountToAllow = new (new BigNumber(50)).times((new BigNumber(10).pow(new BigNumber(18))));
         
         return Token.deployed().then((instance)=>{
             tokenContract = instance;
@@ -14,8 +14,8 @@ contract('Token check', (accounts)=>{
             // here we gonna use acc 1, 2 and 3.
             // 1 host, 2 allowed, 3 receiver
 
-            tokenContract.transfer(accounts[1], amountToTransfer.toString()).then((bb)=>{
-                initialBalance = bb;
+            tokenContract.transfer(accounts[1], amountToTransfer.toString())
+            .then(()=>{
                 return tokenContract.balanceOf(accounts[1]);
             }).then((bb)=>{
                 assert.strictEqual(bb.toString(), amountToTransfer.toString(), "Invalid amount transferred.");

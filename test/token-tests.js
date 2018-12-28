@@ -34,7 +34,8 @@ contract('Token check', function(accounts){
             assert.strictEqual(contractSymbol, symbol, "Incorrect symbol");
             return tokenContract.totalSupply.call();
         }).then(function(contractTotalSupply){
-            assert.strictEqual(contractTotalSupply.toNumber(), (new BigNumber(totalSupply).times(BigNumber(10).pow(BigNumber(18)))).toNumber(), "Incorrect total supply");
+            const x = new BigNumber(contractTotalSupply);
+            assert.strictEqual(x.toNumber(), (new BigNumber(totalSupply).times(BigNumber(10).pow(BigNumber(18)))).toNumber(), "Incorrect total supply");
 
             return tokenContract.distributionAddress.call();
         }).then(function(distributionAddress){

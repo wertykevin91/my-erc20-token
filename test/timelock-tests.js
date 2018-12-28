@@ -13,7 +13,7 @@ contract('Token Timelock tests', async(accounts, b, c) => {
         let timelockContract = await TokenTimelock.deployed();
         let timelockBalance = await tokenContract.balanceOf(timelockContract.address);
 
-        const tokenToLock = 200 * Math.pow(10, 18);
+        const tokenToLock = (new BigNumber(200)).times((new BigNumber(10).pow(new BigNumber(18))));
 
         // Enable transfers
 
@@ -21,9 +21,9 @@ contract('Token Timelock tests', async(accounts, b, c) => {
 
         // Prepare timelock contract
 
-        await tokenContract.transfer(timelockContract.address, tokenToLock);
+        await tokenContract.transfer(timelockContract.address, web3.utils.toBN(tokenToLock));
         let ntimelockBalance = await tokenContract.balanceOf(timelockContract.address);
-        assert.strictEqual(ntimelockBalance.toNumber(), tokenToLock + timelockBalance.toNumber());
+        assert.strictEqual((new BigNumber(ntimelockBalance)).toString(), tokenToLock.plus(timelockBalance).toString());
     });
 
     it('Test timelock contract', async()=> {
@@ -32,7 +32,7 @@ contract('Token Timelock tests', async(accounts, b, c) => {
         let timelockBalance = await tokenContract.balanceOf(timelockContract.address);
 
         const totalSupply = tokenConfig.tokenTotalSupply;
-        const tokenToLock = 200 * Math.pow(10, 18);
+        const tokenToLock = (new BigNumber(200)).times((new BigNumber(10).pow(new BigNumber(18))));
 
         const today = Math.round(Date.now() / 1000);
 
@@ -40,7 +40,7 @@ contract('Token Timelock tests', async(accounts, b, c) => {
 
         var hasError = false;
 
-        await tokenContract.transfer(timelockContract.address, tokenToLock);
+        await tokenContract.transfer(timelockContract.address, web3.utils.toBN(tokenToLock));
         try{
             await timelockContract.release();
         }catch(e){
@@ -49,17 +49,19 @@ contract('Token Timelock tests', async(accounts, b, c) => {
         assert.strictEqual(hasError, true, "No error even though not release time.");
 
         let ntimelockBalance = await tokenContract.balanceOf(timelockContract.address);
-        assert.strictEqual(ntimelockBalance.toNumber(), tokenToLock + timelockBalance.toNumber());
-
+        assert.strictEqual((new BigNumber(ntimelockBalance)).toString(), tokenToLock.plus(timelockBalance).toString());
+        //console.log(timelockContract);
         // only applicable for local testnet
         // RPC call to move timestamp forward
-        
         if(web3.currentProvider.host.indexOf("localhost") !== -1 || web3.currentProvider.host.indexOf("127.0.0.1") !== -1){
-            var rpcCall = await web3.currentProvider.send({
+            // console.log(web3.currentProvider.send);
+            await web3.currentProvider.send({
                 jsonrpc: "2.0", 
                 method: "evm_increaseTime", 
-                params: [minutes1 + 1], id: 0
-            });
+                params: [minutes1 + 1], 
+                id: 0
+            }, function(){});
+
             //console.log(rpcCall);
     
             hasError = false;
@@ -71,10 +73,10 @@ contract('Token Timelock tests', async(accounts, b, c) => {
             assert.strictEqual(hasError, false, "Error even though release time.");
             
             ntimelockBalance = await tokenContract.balanceOf(timelockContract.address);
-            assert.strictEqual(ntimelockBalance.toNumber(), 0, "Balance not invalid.");
+            assert.strictEqual((new BigNumber(ntimelockBalance)).toNumber(), 0, "Balance not invalid.");
     
             let ownerBalance = await tokenContract.balanceOf(accounts[0]);
-            assert.strictEqual(ownerBalance.toNumber(), (new BigNumber(totalSupply).times(BigNumber(10).pow(BigNumber(18)))).toNumber(), "Owner balance invalid.");
+            assert.strictEqual((new BigNumber(ownerBalance)).toString(), (new BigNumber(totalSupply).times(BigNumber(10).pow(BigNumber(18)))).toString(), "Owner balance invalid.");
         }
     });
 });

@@ -1,5 +1,6 @@
 const Token = artifacts.require('./Token.sol');
 const TokenCrowdSale = artifacts.require('./TokenCrowdSale.sol');
+const BigNumber = require("bignumber.js");
 
 contract("TokenCrowdSale Tests", async(accounts) => {
     it('Check distribution address balance', async() => {
@@ -7,19 +8,18 @@ contract("TokenCrowdSale Tests", async(accounts) => {
         let crowdsaleContract = await TokenCrowdSale.deployed();
         
         // TODO: depends on how much you want to send
-        let crowdsaleContractTokenInitial = 100000000 * Math.pow(10, 18);
-
+        let crowdsaleContractTokenInitial = (new BigNumber(100000000)).times((new BigNumber(10).pow(new BigNumber(18))));
+        
         let distributionAddress = await tokenContract.distributionAddress.call();
         assert.strictEqual(distributionAddress, crowdsaleContract.address, "Invalid contract address");
 
         //console.log(tokenContract);
-        await tokenContract.distributeTokens(crowdsaleContract.address, crowdsaleContractTokenInitial);
-        
+        await tokenContract.distributeTokens(crowdsaleContract.address, web3.utils.toBN(crowdsaleContractTokenInitial));
         // verify contract has tokens
 
         let crowdsaleContractBalance = await tokenContract.balanceOf.call(crowdsaleContract.address);
         //console.log(crowdsaleContractBalance.toNumber());
-        assert.strictEqual(crowdsaleContractTokenInitial, crowdsaleContractBalance.toNumber(), "Invalid contract balance");
+        assert.strictEqual(crowdsaleContractTokenInitial.toNumber(), (new BigNumber(crowdsaleContractBalance)).toNumber(), "Invalid contract balance");
     });
     
     // buy tokens from contract
@@ -41,7 +41,7 @@ contract("TokenCrowdSale Tests", async(accounts) => {
             // verify contract actually gave me some tokens
 
             let buyerBalance = await tokenContract.balanceOf.call(accounts[5]);
-            assert.strictEqual(buyerBalance.toNumber() / Math.pow(10,18), 0, "Invalid buyer balance: has tokens");
+            assert.strictEqual((new BigNumber(buyerBalance)).toNumber() / Math.pow(10,18), 0, "Invalid buyer balance: has tokens");
         }catch(e){
             //console.log(e);
             whitelistError = e != null;
@@ -49,7 +49,7 @@ contract("TokenCrowdSale Tests", async(accounts) => {
         assert.strictEqual(whitelistError, true, "Non-whitelisted user not bounced.");
 
         // add account into whitelist
-        await crowdsaleContract.addToWhiteList([accounts[5]], [Math.pow(10,18)]);
+        await crowdsaleContract.addToWhiteList([accounts[5]], [web3.utils.toBN((new BigNumber(10).pow(new BigNumber(18))))]);
 
         // reset variable
         whitelistError = false;
@@ -70,8 +70,8 @@ contract("TokenCrowdSale Tests", async(accounts) => {
             var tokens = 180;
 
             let buyerBalance = await tokenContract.balanceOf.call(accounts[5]);
-            assert.isAtLeast(buyerBalance.toNumber() / Math.pow(10, 18), tokens - error, "Invalid buyer balance: too little tokens");
-            assert.isAtMost(buyerBalance.toNumber() / Math.pow(10, 18), tokens + error, "Invalid buyer balance: too much tokens");
+            assert.isAtLeast((new BigNumber(buyerBalance)).toNumber() / Math.pow(10, 18), tokens - error, "Invalid buyer balance: too little tokens");
+            assert.isAtMost((new BigNumber(buyerBalance)).toNumber() / Math.pow(10, 18), tokens + error, "Invalid buyer balance: too much tokens");
         }catch(e){
             console.log(e);
             whitelistError = e != null;

@@ -1,3 +1,4 @@
+const BigNumber = require("bignumber.js");
 const Token = artifacts.require('./Token.sol');
 
 contract('Token check', function(accounts){
@@ -6,19 +7,19 @@ contract('Token check', function(accounts){
 
         var tokenContract;
         var startingTotalSupply;
-        const burnAmount = 500 * Math.pow(10, 18);
+        const burnAmount =  (new BigNumber(500)).times((new BigNumber(10).pow(new BigNumber(18))));
         
         return Token.deployed().then((instance)=>{
             tokenContract = instance;
-            return tokenContract.totalSupply();
+            return tokenContract.totalSupply.call();
         }).then((totalSupply)=>{
-            startingTotalSupply = totalSupply.toNumber(); 
+            startingTotalSupply = (new BigNumber(totalSupply)); 
             // token does not need to be transferrable to be burnable
-            return tokenContract.burnSent(burnAmount);
+            return tokenContract.burnSent(web3.utils.toBN(burnAmount));
         }).then(()=>{
-            return tokenContract.totalSupply();
+            return tokenContract.totalSupply.call();
         }).then((totalSupply)=>{
-            assert.strictEqual(totalSupply.toNumber(), startingTotalSupply - burnAmount, "Invalid total supply after burning.")
+            assert.strictEqual((new BigNumber(totalSupply)).toNumber(), startingTotalSupply.minus(burnAmount).toNumber(), "Invalid total supply after burning.")
         });
     });
 });
